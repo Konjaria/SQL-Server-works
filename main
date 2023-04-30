@@ -1,48 +1,50 @@
 -- Create four tables: Customers, Orders, OrderItems, and Products.
-create table Customers(
-	--Customers table should have columns id, first_name, last_name, email, and phone.
-	id int identity primary key, 
-	first_name nvarchar(20) not null,
-	last_name nvarchar(20) not null,
-	email nvarchar(30) not null,
-	phone nvarchar(10) not null,
-)
 
-create table Orders(
-	-- Orders table should have columns id, customer_id, order_date,
-	-- ship_date, ship_address, ship_city, ship_state, and ship_zip.
-	id int identity primary key, 
-	customer_id int, 
-	order_date date default getdate(),
-	ship_date date, 
-	ship_address date,
-	ship_city nvarchar(20) default N'თბილისი',
-	ship_zip int
+create table Customers (
+    --Customers table should have columns id, first_name, last_name, email, and phone.
+    id int identity primary key, 
+    first_name nvarchar(20) not null,
+    last_name nvarchar(20) not null,
+    email nvarchar(30) not null,
+    phone nvarchar(10) not null
+);
 
-	constraint fk_cust_or foreign key (customer_id) references Customers(id) on update cascade,
-	constraint uniq_cust unique (customer_id)
-)
+create table Orders (
+    -- Orders table should have columns id, customer_id, order_date,
+    -- ship_date, ship_address, ship_city, ship_state, and ship_zip.
+    id int identity primary key, 
+    customer_id int, 
+    order_date date default getdate(),
+    ship_date date, 
+    ship_address nvarchar(50),
+    ship_city nvarchar(20) default N'თბილისი',
+    ship_state nvarchar(20),
+    ship_zip nvarchar(10),
 
-create table Products(
-	-- Products table should have columns id, name, description, and price.
-	id int identity primary key, 
-	ProductName nvarchar(30),
-	ProductDescription text,
-	price DECIMAL(10, 2)
-)
+    constraint fk_cust_or foreign key (customer_id) references Customers(id) on update cascade,
+    constraint uniq_cust unique (id, customer_id) -- Unique constraint should be on id and customer_id columns
+);
 
+create table Products (
+    -- Products table should have columns id, name, description, and price.
+    id int identity primary key, 
+    name nvarchar(50),
+    description text,
+    price DECIMAL(10, 2)
+);
 
-create table OrderItems(
-	-- OrderItems table should have columns id, order_id, product_id,
-	-- quantity, and price_per_unit.
-	id int identity primary key, 
-	order_id int,
-	product_id int, 
-	quantity decimal(10, 2),
-	price_per_unit decimal(10, 2)
-	-- A many-to-many relationship between Orders and Products tables through the OrderItems table.
-	-- Each order can have multiple products, and each product can be part of multiple orders.
-	constraint fk_ord_prod foreign key (order_id) references Orders(id),
-	constraint fk_prod_ord foreign key (product_id) references Products(id),
-	constraint uniq_keys unique (order_id, product_id)
-)
+create table OrderItems (
+    -- OrderItems table should have columns id, order_id, product_id,
+    -- quantity, and price_per_unit.
+    id int identity primary key, 
+    order_id int,
+    product_id int, 
+    quantity decimal(10, 2),
+    price_per_unit decimal(10, 2),
+
+    -- A many-to-many relationship between Orders and Products tables through the OrderItems table.
+    -- Each order can have multiple products, and each product can be part of multiple orders.
+    constraint fk_ord_prod foreign key (order_id) references Orders(id),
+    constraint fk_prod_ord foreign key (product_id) references Products(id),
+    constraint uniq_keys unique (order_id, product_id)
+);
